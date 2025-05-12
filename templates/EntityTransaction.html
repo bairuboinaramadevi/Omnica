@@ -1,0 +1,1469 @@
+{% extends "MasterHeader.html" %} {% block content %}
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+
+<title>Transactions</title>
+
+<!-- Links -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<link href="https://cdn.syncfusion.com/ej2/material.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="../../static/CDN/scripts/colored-toasts.css" />
+
+<!-- SCRIPT -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
+<script src="https://ej2.syncfusion.com/javascript/demos/grid/checkbox-selection/datasource.js"
+  type="text/javascript"></script>
+<script src="../../static/CDN/scripts/events-library.js" type="text/javascript"></script>
+<!-- HTML style tag -->
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<!-- <script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script> -->
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+
+  .container {
+    margin: 20px;
+  }
+
+  button {
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    padding: 8px;
+    margin-top: 5px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #balanceDisplay,
+  #connectionStatus,
+  #transactionList {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  .error {
+    color: red;
+  }
+
+  .success {
+    color: green;
+  }
+
+  #balanceSection,
+  #transferSection,
+  #transactionSection {
+    display: none;
+  }
+
+  /* Initially hide sections */
+</style>
+<style>
+  .container {
+    padding: 2% 0;
+  }
+
+  #container {
+    position: relative;
+    height: 100%;
+  }
+
+  #footer {
+    position: fixed;
+    padding: 10px 10px 0px 10px;
+    bottom: 0;
+    width: 100%;
+    /* Height of the footer*/
+    height: 40px;
+    text-align: center;
+    /* background: grey; */
+  }
+
+  #grid-container {
+    height: calc(100% - 56px);
+    /* subtract height of FAB */
+  }
+
+  .e-checkbox-wrapper .e-frame.e-check,
+  .e-css.e-checkbox-wrapper .e-frame.e-check {
+    background-color: #2b0210;
+  }
+
+  .e-checkbox-wrapper .e-frame.e-check,
+  .e-css.e-checkbox-wrapper .e-frame.e-check:hover {
+    background-color: #2b0210;
+  }
+
+  #add-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  #navtabs .nav.nav-tabs {
+    --bs-nav-link-padding-x: 0;
+  }
+
+  #navtabs .nav-item {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #navtabs .nav-item.active {
+    background-color: darkgrey;
+  }
+
+  #navtabs .nav-item.active .nav-link {
+    color: white !important;
+  }
+
+  #navtabs .nav-tabs .nav-link {
+    border: none;
+  }
+
+  #navtabs .nav-item.active .nav-link:hover {
+    border: none;
+  }
+
+  /* CSS styles for the modal content and form inputs */
+  /* .modal-content {
+    max-width: 800px;
+   
+  } */
+
+  #insertForm input[type="text"],
+  #insertForm select {
+    max-width: 80%;
+    /* adjust as needed */
+  }
+
+  .input_field {
+    width: 300px;
+
+  }
+
+  /* .modal-dialog {
+    max-width: 800px;
+    margin: 0 auto;
+    
+  } */
+
+  #navtabs {
+    /* add a clearfix to the container to clear floats */
+    overflow: auto;
+  }
+
+  .right-btn {
+    float: right !important;
+    position: relative;
+    margin-left: 10px;
+  }
+
+  input.btn {
+    float: right !important;
+    position: relative;
+    margin-left: 10px;
+  }
+
+  #navtabs button.btn {
+    float: right;
+    border: 2px solid black;
+  }
+
+  .form-group label,
+  legend {
+    margin: 5px !important;
+    font-weight: bold;
+  }
+
+  .form-group {
+    margin: 10px !important;
+  }
+
+  .form-group input[type="radio"],
+  .form-group input[type="checkbox"] {
+    font-weight: normal;
+  }
+
+  #insertForm input[type="text"],
+  #insertForm select {
+    max-width: 80%;
+    /* adjust as needed */
+  }
+
+  .refresh-icon {
+    margin-left: 10px;
+    cursor: pointer;
+    position: relative;
+    /* To position it relative to the input */
+    /* top: 50%; */
+    transform: translateY(-50%);
+  }
+
+  #amountToSend {
+    padding-right: 30px;
+    /* Make space for the icon */
+  }
+
+  .dashboard-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    /* First column takes 2/3, second 1/3 */
+    grid-template-rows: 1fr 1fr;
+    /*Two rows of equal height*/
+    grid-gap: 20px;
+    /* Space between the divs */
+  }
+
+  .widget {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    height: 230px;
+    /* Added fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-size: 1.2em;
+    text-align: center;
+  }
+
+  #div1 {
+    grid-column: 1 / 2;
+    /* Span across the first column */
+    grid-row: 1 / 1;
+  }
+
+  #div2 {
+    grid-column: 2 / 3;
+    /* Start at the second column */
+    grid-row: 1/1;
+  }
+
+  #div3 {
+    grid-column: 2 / 3;
+    grid-row: 2/2;
+  }
+
+  #div4 {
+    grid-column: 1/2;
+    grid-row: 2/2;
+  }
+
+  /* Optional: Adjust for smaller screens if needed */
+  @media (max-width: 600px) {
+    .dashboard-container {
+      grid-template-columns: 1fr;
+      /* Stack on small screens */
+    }
+  }
+
+  #chartdiv2 {
+    width: 80%;
+    height: 230px;
+  }
+
+  #chartdiv1 {
+    width: 80%;
+    height: 230px;
+  }
+
+  #chartdiv3 {
+    width: 80%;
+    height: 230px;
+  }
+
+  #chartdiv4 {
+    width: 80%;
+    height: 230px;
+  }
+</style>
+
+
+
+<!-- HTML body tag  -->
+
+<body>
+
+
+
+  <ul id="breadcrumb"></ul>
+
+  <!-- GRID opening view -->
+  <div class="container" id="container">
+    <div>
+      <!-- <button type="button" onclick="window.top.location.href='/MasterHeader#TasksInventory'" class="btn btn-primary">
+         Go To Inventory
+       </button> -->
+      <!-- <button type="button"  class="btn btn-primary"  data-bs-toggle="modal"
+       data-bs-target="#balanceModal">Get Balance</button> -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transferModal">Pay Medical
+        Bill on Soneium</button>
+      <!-- <button type="button" onclick="window.top.location.href='/MasterHeader#TasksScheduler'" class="btn btn-primary">
+         Go To Scheduler
+       </button> -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fraudModal">Fraud
+        Analytics on Soneium Transactions</button>
+
+
+    </div>
+    <br />
+    <div id="GridTooltip">
+      <div id="Grid">
+        <h4>Please wait... Fetching Transaction Details</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add connection div element -->
+  <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>
+            Pay Medical Bill on Soneium
+          </h5>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="overflow-y: scroll;height: 457px;">
+          <div id="connectionArea">
+            <h4>Connection Status</h4>
+            <div id="connectionStatus"></div>
+            <button id="connectButton" class="btn btn-info" onclick="connectMetaMask()">Connect
+              MetaMask</button>
+          </div>
+          <hr>
+          <div id="balanceSection">
+            <h4>Get Balance</h4>
+            <label for="balanceAddress">Soneium Address:</label>
+            <input class="form form-control" type="text" id="balanceAddress" placeholder="Enter Soneium address">
+            <button class="btn btn-info" onclick="getBalance()">Get Balance</button>
+            <div id="balanceDisplay"></div>
+            <div id="balanceError" class="error"></div>
+          </div>
+
+          <hr>
+
+          <div id="transferSection">
+            <h4>Transfer Soneium (MetaMask)</h4>
+            <label for="purpose">Purpose:</label>
+            <input class="form form-control" type="text" id="purpose" placeholder="Enter Purpose">
+            <br>
+            <label for="recipientName">Recipient Address:</label>
+            <input class="form form-control" type="text" id="recipientName" placeholder="Enter recipient Name" />
+            <br>
+            <label for="recipientAddress">Recipient Address:</label>
+            <input class="form form-control" type="text" id="recipientAddress" placeholder="Enter recipient address" />
+            <br>
+            <label for="amountToSend">Amount (USD):</label>
+            <input class="form form-control" type="number" id="amountToSend" placeholder="Enter amount to send(USD)" />
+            <i class="bi bi-arrow-clockwise refresh-icon" onclick="loadConvertedValue()"></i>
+            <div id="convertedVal"></div>
+            <button class="btn btn-info" onclick="transferETH()">Transfer</button>
+            <div id="transferStatus"></div>
+            <div id="transferError" class="error"></div>
+            <div id="transferSuccess" class="success"></div>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: flex-start; height: 60px">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            style="position: absolute; right: 0px">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#disputeModal" id="disputeButton"
+  style="display: none;"></button>
+
+  <div class="modal fade" id="disputeModal" tabindex="-1" aria-labelledby="disputeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>
+            Settle Dispute
+          </h5>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="overflow-y: scroll;height: 457px;">
+          <div>
+            <h4>Transaction Dispute Form</h4>
+            <br/>
+            <h6>
+              This form must be completed and submitted as soon as a disputed transaction is identified. Transaction disputes must be received within 60 calendar days from original transaction(s) settlement date; otherwise your dispute rights might be compromised.
+            </h6>
+            <h5>
+              Instructions for Completing the Transaction Dispute Form
+            </h5>
+            <ul>
+              <li>Complete all fields in the form.</li>
+              <li>Sign and Date the form.</li>
+            </ul>
+          </div>
+          <hr>
+          <div id="disputeSection">
+            <label for="purpose">Settlement Purpose:</label>
+            <input class="form form-control" type="text" id="purposeDis" placeholder="Enter Purpose">
+            <br>
+            <label for="partnerName">Partner Name:</label>
+            <input class="form form-control" type="text" id="partnerNameDis" placeholder="Enter Partner Name" />
+            <br>
+            <label for="recipientName">Recipient Name:</label>
+            <input class="form form-control" type="text" id="recipientNameDis" placeholder="Enter recipient Name" value="James Wood" />
+            <br>
+            <label for="recipientAddress">Recipient Address:</label>
+            <input class="form form-control" type="text" id="recipientAddressDis" placeholder="Enter recipient address" />
+            <br>
+            <input class="form form-control" type="text" id="partnerAddressDis" style="display: none;" placeholder="Enter recipient address" />
+            <label for="amountToSend">Amount (USD):</label>
+            <input class="form form-control" type="number" id="amountToSendDis" placeholder="Enter amount to send(USD)" />
+            <i class="bi bi-arrow-clockwise refresh-icon" onclick="loadConvertedValueDis()"></i>
+            <div id="convertedValDis"></div>
+            <button class="btn btn-info" onclick="transferETHDis()">Transfer</button>
+            <div id="transferStatusDis"></div>
+            <div id="transferErrorDis" class="error"></div>
+            <div id="transferSuccessDis" class="success"></div>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: flex-start; height: 60px">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            style="position: absolute; right: 0px">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#payoutModal" id="payoutButton"
+    style="display: none;"></button>
+
+  <div class="modal fade" id="payoutModal" tabindex="-1" aria-labelledby="payoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>
+            Automated Medical Payouts on Soneium
+          </h5>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="overflow-y: scroll;height: 457px;">
+          <div id="schedule"></div>
+        </div>
+        <div class="modal-footer" style="justify-content: flex-start; height: 60px">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            style="position: absolute; right: 0px">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#payoutModal" id="payoutButton" style="display: none;"></button> -->
+
+  <div class="modal fade" id="fraudModal" tabindex="-1" aria-labelledby="fraudModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fraudModalLabel">Fraud Detection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="height: 500px; overflow-y: hidden">
+          <div class="dashboard-container">
+            <div id="div1" class="widget">
+              <div id="chartdiv1"></div>
+            </div>
+            <div id="div2" class="widget">
+              <div id="chartdiv2"></div>
+            </div>
+            <div id="div4" class="widget">
+              <div id="chartdiv3"></div>
+            </div>
+            <div id="div3" class="widget">
+              <div id="chartdiv4"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: flex-start; height: 60px">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            style="position: absolute; right: 0px">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insert,Edit div element -->
+  <div class="modal fade" style="margin-top: 2em;" id="Modal" tabindex="-1" aria-labelledby="ModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="insertForm"></form>
+          <form id="updateForm"></form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Outer SCRIPT's Link -->
+
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../CDN/scripts/jquery.json-editor.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
+  <!-- <script>
+            ej.base.registerLicense('Mgo+DSMBaFt+QHJqUU1mQ1hbdF9AXnNNdFN+T2JZby8Nf1dGYl9RQXdaQlljT3tQc0dqUQ==;Mgo+DSMBPh8sVXJ1S0R+WFpCaVZdX2NLfUNyT2NRdV9wZCQ7a15RRnVfR1xmSXpTcEBgXHtbeA==;ORg4AjUWIQA/Gnt2VFhiQlVPcEBLQmFJfFBmQWlZd1RxdEU3HVdTRHRcQlhiTH5XdkNmWnpbeXc=;MjA0NDY4MUAzMjMxMmUzMjJlMzRKRC8yODFIQjFKc2FwNG9ETkhVT0xXNmJIS25xWk1lRk9icGl2dktub3BFPQ==;MjA0NDY4MkAzMjMxMmUzMjJlMzRZU25XMHc3ekpudDlnb21XTWNXSzg2NjE3bS9QWk9uZkFkTmNjbGFrNlVzPQ==;NRAiBiAaIQQuGjN/V0d+Xk9AfVldVHxLflF1VWdTf1Z6dVVWESFaRnZdQV1mSHtTckVlXHxYcXFd;MjA0NDY4NEAzMjMxMmUzMjJlMzRqWG54NDhxdlFHbzUyOWRXS0tiUnpFRUR0N0EweURuc0oxQXZFYjlIYTNJPQ==;MjA0NDY4NUAzMjMxMmUzMjJlMzRNMGtJL2Z6ZWQySXlMUEllR1BEMHNvaCtBSFBSekJDRittWHNoZlBnQVpVPQ==;Mgo+DSMBMAY9C3t2VFhiQlVPcEBLQmFJfFBmQWlZd1RxdEU3HVdTRHRcQlhiTH5XdkNmWnlYd3w=;MjA0NDY4N0AzMjMxMmUzMjJlMzRadXZXbE1wZkJNc1hUKytLNFI2UHZOQi9lbGhlRUtLSXlkODdWOFhOa1hRPQ==;MjA0NDY4OEAzMjMxMmUzMjJlMzRQTnpNMWxjWEllbVBSVXp6cmRjc3lYdEVDNTNtYnY1SWp4bm1TdXZwekR3PQ==;MjA0NDY4OUAzMjMxMmUzMjJlMzRqWG54NDhxdlFHbzUyOWRXS0tiUnpFRUR0N0EweURuc0oxQXZFYjlIYTNJPQ==');
+          </script> -->
+
+  <!-- SCRIPT -->
+  <script type="text/x-template" id="errorsTemplate">
+     <div id="errorsColumn" style="display:none">${Errors}</div>
+     <span class="fs-5">
+       <i class="e-icons e-split-vertical"></i>
+     </span> 
+   </script>
+  <script type="text/javascript">
+
+    ej.base.enableRipple(true);
+    //Breadcrumb items definition
+    var items = [
+      {
+        iconCss: 'e-icons e-home',
+        url: "/",
+      },
+
+      {
+        id: 'breadcrumb_my_entities',
+        text: "My Entities",
+        url: "/EntitiesList",
+      },
+      {
+        id: 'breadcrumb_spectra',
+        text: "EntityTransaction",
+        url: "/EntityTransaction",
+
+      }
+    ];
+
+    new ej.navigations.Breadcrumb({
+      items: items,
+      enableNavigation: true
+    }, '#breadcrumb');
+
+    //  Render to Landing.html if UserName is NULL or empty.
+    // if (localStorage.getItem("UserName") == "" || localStorage.getItem("UserName") == null) {
+    //     window.location.href = "Landing.html";
+    // }
+
+    // Logout script
+    $("body").on("click", "#logout", function () {
+      localStorage.setItem("CurrentWsp", "");
+      localStorage.setItem("UserName", "");
+      window.location.href = "Landing.html";
+    });
+
+
+
+    // gridData as a var declared 
+    var gridData = [];
+
+
+    var grid = ""
+
+
+    // Grid script
+    document.addEventListener("DOMContentLoaded", _ => {
+
+      let url = "/get_transactions"
+      Swal.fire({ title: "fetching Transactions..please wait" });
+      Swal.showLoading();
+      setTimeout(async () => {
+        fetch(url)
+          .then(res => res.json())
+          .then(entity_res => {
+            console.log(entity_res);
+
+            grid.dataSource = entity_res
+            grid.refresh();
+            Swal.close();
+          });
+      }, 100);
+      $('#Grid').html("")
+      ej.grids.Grid.Inject(ej.grids.Edit);
+
+      grid = new ej.grids.Grid({
+        dataSource: [],
+        allowFiltering: true,
+        filterSettings: {
+          type: 'Menu',
+        },
+        editSettings: { allowEditing: true, allowDeleting: true, mode: 'Normal' },
+        commandClick: commandClick,
+        //  allowSelection: true,
+        allowPaging: true,
+        allowSorting: true,
+        allowTextWrap: false,
+        allowFiltering: true,
+        height: 400,
+        // width: 1150,
+        rowHeight: 40,
+        // Header of Grid
+        columns: [
+          //  { type: 'checkbox',width: 50 },
+          { field: 'TransactionId', headerText: 'ID', width: 70, allowEditing: false, allowFiltering: false },
+          { field: 'Date', headerText: 'Date', width: 120, allowEditing: false, allowFiltering: false },
+          { field: 'Purpose', headerText: 'Purpose', width: 120, allowEditing: false, allowFiltering: false },
+
+          { field: 'EntityID', headerText: "Entity ID", width: 100, allowEditing: false, allowFiltering: false, visible: false },
+          { field: 'SenderAccount', headerText: "Sender's Account", width: 230, allowEditing: false, allowFiltering: false, visible: false },
+          { field: 'PartnerName', headerText: "Partner Name", width: 150, allowEditing: false, allowFiltering: false },
+          { field: 'ReceiverAccount', headerText: "Partner Account", width: 180, allowEditing: false, allowFiltering: false },
+          { field: 'AmountInUSD', headerText: "Amount(USD)", width: 130, allowEditing: false, allowFiltering: false },
+          { field: 'AmountInSoneium', headerText: "Soneium(ETH)", width: 130, allowEditing: false, allowFiltering: false },
+          { field: 'TransactionHash', headerText: "Transaction Hash", width: 280, allowEditing: false, allowFiltering: false, visible: false },
+          {
+            headerText: 'Actions', width: 100, commands: [
+              { type: "VerifyPayment", buttonOption: { iconCss: "e-eye e-medium e-icons", cssClass: 'e-flat' } },
+              { type: "MonthlyPayout", buttonOption: { iconCss: "e-repeat e-medium e-icons", cssClass: 'e-flat' } },
+              { type: "SettleDispute", buttonOption: { iconCss: "e-search e-medium e-icons", cssClass: 'e-flat' } }
+            ]
+          }
+
+          // { field: 'CreatedUser', headerText: 'CreatedUser', visible: false },
+          // { field: 'CreatedDate', headerText: 'CreatedDate', visible: false },
+          // { field: 'ModifiedUser', headerText: 'ModifiedUser', visible: false },
+          // { field: 'ModifiedDate', headerText: 'ModifiedDate', visible: false },
+
+        ],
+
+      });
+      grid.appendTo('#Grid');
+      function commandClick(args) {
+
+        if (args.commandColumn.type == "VerifyPayment") {
+
+          window.open("https://soneium-minato.blockscout.com/tx/" + args.rowData.TransactionHash, "_blank");
+        }
+        else if (args.commandColumn.type == "MonthlyPayout") {
+
+          document.getElementById("payoutButton").click();
+        }
+        else if (args.commandColumn.type == "SettleDispute") {
+          rowData = args.rowData;
+          document.getElementById("partnerNameDis").value=rowData.PartnerName;
+          document.getElementById("partnerAddressDis").value=rowData.ReceiverAccount;
+          document.getElementById("recipientNameDis").value=rowData.UserName;
+          document.getElementById("recipientAddressDis").value=rowData.SenderAccount;
+          document.getElementById("amountToSendDis").value=rowData.AmountInUSD;
+          document.getElementById("disputeButton").click();
+        }
+      }
+      const date1 = new Date();
+
+      let day1 = date1.getDate();
+      let month1 = date1.getMonth();
+      ej.schedule.Schedule.Inject(
+        ej.schedule.Week,
+        ej.schedule.WorkWeek,
+        ej.schedule.Month
+      );
+
+      var today = new Date();
+      var yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      var scheduleObj = new ej.schedule.Schedule({
+        width: "100%",
+        height: "430px",
+        AllowDeleting: false,
+
+        minDate: yesterday,
+        selectedDate: new Date(2025, month1, day1),
+        timezone: 'Asia/Calcutta',
+        views: [
+          { option: "Week", startHour: "00:00", endHour: "24:00" },
+          { option: "WorkWeek", startHour: "00:00", endHour: "24:00" },
+          { option: "Month", showWeekend: false },
+        ],
+      });
+      scheduleObj.appendTo("#schedule");
+
+    });
+    var currentAccount;
+
+    async function connectMetaMask() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          console.log('MetaMask connected. Accounts:', accounts);
+          window.web3 = new Web3(window.ethereum);
+
+          document.getElementById('connectionStatus').textContent = 'MetaMask connected with account: ' + accounts[0];
+          document.getElementById('connectButton').style.display = 'none';
+          document.getElementById('balanceSection').style.display = 'block';
+          document.getElementById('transferSection').style.display = 'block';
+          // document.getElementById('transactionSection').style.display = 'block'; // Show transaction section
+          document.getElementById('balanceAddress').value = accounts[0];
+          document.getElementById('recipientAddress').value = "0x7D0E5A222874A10d09658c451dd8e0F534E8Ae7A";
+          document.getElementById('recipientName').value = "Sunshine Diagnostics";
+
+
+        } catch (error) {
+          console.error('Could not connect to MetaMask:', error);
+          document.getElementById('connectionStatus').textContent = 'Could not connect to MetaMask: ' + error.message;
+        }
+      } else {
+        document.getElementById('connectionStatus').textContent = 'MetaMask not found. Please install it.';
+      }
+    }
+
+    window.addEventListener('load', async () => {
+      // window.ethereum='undefined'
+      if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+        window.web3 = new Web3(window.ethereum);
+        document.getElementById('connectionStatus').textContent = 'MetaMask connected with account: ' + window.ethereum.selectedAddress;
+        document.getElementById('balanceAddress').value = window.ethereum.selectedAddress;
+        document.getElementById('connectButton').style.display = 'none';
+        document.getElementById('balanceSection').style.display = 'block';
+        document.getElementById('transferSection').style.display = 'block';
+        document.getElementById('recipientAddress').value = "0x7D0E5A222874A10d09658c451dd8e0F534E8Ae7A";
+        document.getElementById('recipientName').value = "Sunshine Diagnostics";
+
+        // document.getElementById('transactionSection').style.display = 'block'; // Show transaction section
+      } else {
+        document.getElementById('connectionStatus').textContent = 'Please connect to MetaMask.';
+        document.getElementById('balanceSection').style.display = 'none';
+        document.getElementById('transferSection').style.display = 'none';
+        // document.getElementById('transactionSection').style.display = 'none'; // Hide transaction section
+      }
+    });
+
+    function getBalance() {
+      var address = document.getElementById('balanceAddress').value;
+      var balanceDisplay = document.getElementById('balanceDisplay');
+      var balanceError = document.getElementById('balanceError');
+
+      balanceDisplay.textContent = 'Loading...';
+      balanceError.textContent = '';
+
+      if (!window.web3) {
+        balanceError.textContent = 'Web3 is not initialized. Please connect to MetaMask.';
+        balanceDisplay.textContent = '';
+        return;
+      }
+
+      window.web3.eth.getBalance(address, function (error, balanceWei) {
+        balanceDisplay.textContent = '';
+        if (error) {
+          console.error('Error getting balance:', error);
+          balanceError.textContent = 'Error: ' + error.message;
+        } else {
+          var balanceEth = window.web3.utils.fromWei(balanceWei, 'ether');
+          balanceDisplay.textContent = 'Balance: ' + balanceEth + ' ETH';
+        }
+      });
+    }
+    function loadConvertedValue() {
+      var amountToSendUSD = document.getElementById('amountToSend').value;
+      const conversionRate = 0.000416;
+      var convertedAmount = parseFloat(amountToSendUSD) * conversionRate;
+      document.getElementById('convertedVal').innerText = `Amount in SONEIUM: ${convertedAmount.toFixed(4)} SONEIUM`;
+    }
+    function loadConvertedValueDis() {
+      var amountToSendUSD = document.getElementById('amountToSendDis').value;
+      const conversionRate = 0.000416;
+      var convertedAmount = parseFloat(amountToSendUSD) * conversionRate;
+      document.getElementById('convertedValDis').innerText = `Amount in SONEIUM: ${convertedAmount.toFixed(4)} SONEIUM`;
+    }
+    function transferETH() {
+      var recipientAddress = document.getElementById('recipientAddress').value;
+      var recipientName = document.getElementById('recipientName').value;
+      var purpose = document.getElementById('purpose').value;
+      var amountToSendUSD = document.getElementById('amountToSend').value;
+      var transferStatus = document.getElementById('transferStatus');
+      var transferError = document.getElementById('transferError');
+      var transferSuccess = document.getElementById('transferSuccess');
+      var amountToSendETH = parseFloat(amountToSendUSD) * 0.000416;
+      transferStatus.textContent = 'Initiating transfer... Please confirm in MetaMask.';
+      transferError.textContent = '';
+      transferSuccess.textContent = '';
+
+      if (!window.web3 || !window.web3.eth || !window.web3.eth.sendTransaction) {
+        transferError.textContent = 'Web3 is not initialized. Please connect to MetaMask.';
+        transferStatus.textContent = '';
+        return;
+      }
+
+      window.web3.eth.getAccounts(function (error, accounts) {
+        if (error) {
+          console.error('Error getting accounts:', error);
+          transferError.textContent = 'Error: ' + error.message;
+          transferStatus.textContent = '';
+          return;
+        }
+        if (accounts.length === 0) {
+          transferError.textContent = 'No Soneium accounts found. Please unlock your wallet and connect.';
+          transferStatus.textContent = '';
+          return;
+        }
+        var fromAddress = accounts[0];
+        var amountWei = window.web3.utils.toWei(amountToSendETH.toString(), 'ether');
+
+        window.web3.eth.sendTransaction({
+          from: fromAddress,
+          to: recipientAddress,
+          value: amountWei,
+        })
+          .on('transactionHash', function (hash) {
+            transferStatus.textContent = 'Transaction pending... Hash: ' + hash;
+          })
+          .on('receipt', function (receipt) {
+            console.log('Transaction successful!', receipt);
+            transferSuccess.textContent = 'Transaction successful! Hash: ' + receipt.transactionHash;
+            transferStatus.textContent = '';
+            var paramsObj = {};
+            paramsObj.EntityID = "a9a8f373-cccd-f537-b143-474775ec";
+            paramsObj.AmountInUSD = parseFloat(amountToSendUSD);
+            paramsObj.AmountInSoneium = parseFloat(amountToSendETH);
+            paramsObj.SenderAccount = fromAddress;
+            paramsObj.ReceiverAccount = recipientAddress;
+            paramsObj.PartnerName = recipientName;
+            paramsObj.Purpose = purpose;
+            paramsObj.UserName = "James Wood";
+            paramsObj.TransactionHash = receipt.transactionHash;
+            console.log('/insert_transaction?dbParams=' + JSON.stringify(paramsObj))
+            debugger
+            fetch('/insert_transaction?dbParams=' + JSON.stringify(paramsObj)).then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+              .then(data => {
+                console.log('transaction saved successfully:', data.message);
+                let url = "/get_transactions"
+                Swal.fire({ title: "fetching Entities..please wait" });
+                Swal.showLoading();
+                setTimeout(async () => {
+                  fetch(url)
+                    .then(res => res.json())
+                    .then(entity_res => {
+                      console.log(entity_res);
+
+                      grid.dataSource = entity_res
+                      grid.refresh();
+                      Swal.close();
+                    });
+                }, 100);
+
+              })
+              .catch(error => {
+                console.error('Error saving transaction:', error);
+              });
+
+          })
+          .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+            console.error('Transfer error:', error, receipt);
+            transferError.textContent = 'Transfer failed: ' + error.message;
+            transferStatus.textContent = '';
+          });
+      });
+    }
+
+    function transferETHDis() {
+      var recipientAddress = document.getElementById('recipientAddressDis').value;
+      var recipientName = document.getElementById('recipientNameDis').value;
+      var purpose = document.getElementById('purposeDis').value;
+      var amountToSendUSD = document.getElementById('amountToSendDis').value;
+      var transferStatus = document.getElementById('transferStatusDis');
+      var transferError = document.getElementById('transferErrorDis');
+      var transferSuccess = document.getElementById('transferSuccessDis');
+      var amountToSendETH = parseFloat(amountToSendUSD) * 0.000416;
+      transferStatus.textContent = 'Initiating transfer... Please confirm in MetaMask.';
+      transferError.textContent = '';
+      transferSuccess.textContent = '';
+
+      if (!window.web3 || !window.web3.eth || !window.web3.eth.sendTransaction) {
+        transferError.textContent = 'Web3 is not initialized. Please connect to MetaMask.';
+        transferStatus.textContent = '';
+        return;
+      }
+
+      window.web3.eth.getAccounts(function (error, accounts) {
+        if (error) {
+          console.error('Error getting accounts:', error);
+          transferError.textContent = 'Error: ' + error.message;
+          transferStatus.textContent = '';
+          return;
+        }
+        if (accounts.length === 0) {
+          transferError.textContent = 'No Soneium accounts found. Please unlock your wallet and connect.';
+          transferStatus.textContent = '';
+          return;
+        }
+        var fromAddress = document.getElementById('partnerAddressDis').value;
+        var amountWei = window.web3.utils.toWei(amountToSendETH.toString(), 'ether');
+
+        window.web3.eth.sendTransaction({
+          from: fromAddress,
+          to: recipientAddress,
+          value: amountWei,
+        })
+          .on('transactionHash', function (hash) {
+            transferStatus.textContent = 'Transaction pending... Hash: ' + hash;
+          })
+          .on('receipt', function (receipt) {
+            console.log('Transaction successful!', receipt);
+            transferSuccess.textContent = 'Transaction successful! Hash: ' + receipt.transactionHash;
+            transferStatus.textContent = '';
+           
+
+          })
+          .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+            console.error('Transfer error:', error, receipt);
+            transferError.textContent = 'Transfer failed: ' + error.message;
+            transferStatus.textContent = '';
+          });
+      });
+    }
+    am5.ready(function () {
+
+      // Create root element
+      // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+      var root = am5.Root.new("chartdiv2");
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+      var chart = root.container.children.push(
+        am5percent.PieChart.new(root, {
+          startAngle: 160, endAngle: 380
+        })
+      );
+
+      // Create series
+      // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+
+      var series0 = chart.series.push(
+        am5percent.PieSeries.new(root, {
+          valueField: "litres",
+          categoryField: "country",
+          startAngle: 160,
+          endAngle: 380,
+          radius: am5.percent(70),
+          innerRadius: am5.percent(65)
+        })
+      );
+
+      var colorSet = am5.ColorSet.new(root, {
+        colors: [series0.get("colors").getIndex(0)],
+        passOptions: {
+          lightness: -0.05,
+          hue: 0
+        }
+      });
+
+      series0.set("colors", colorSet);
+
+      series0.ticks.template.set("forceHidden", true);
+      series0.labels.template.set("forceHidden", true);
+
+      var series1 = chart.series.push(
+        am5percent.PieSeries.new(root, {
+          startAngle: 160,
+          endAngle: 380,
+          valueField: "bottles",
+          innerRadius: am5.percent(80),
+          categoryField: "country"
+        })
+      );
+
+      series1.ticks.template.set("forceHidden", true);
+      series1.labels.template.set("forceHidden", true);
+
+      var label = chart.seriesContainer.children.push(
+        am5.Label.new(root, {
+          textAlign: "center",
+          centerY: am5.p100,
+          centerX: am5.p50,
+          text: "[fontSize:18px]total[/]:\n[bold fontSize:30px]1647.9[/]"
+        })
+      );
+
+      var data = [
+        {
+          country: "Lithuania",
+          litres: 501.9,
+          bottles: 1500
+        },
+        {
+          country: "Czech Republic",
+          litres: 301.9,
+          bottles: 990
+        },
+        {
+          country: "Ireland",
+          litres: 201.1,
+          bottles: 785
+        },
+        {
+          country: "Germany",
+          litres: 165.8,
+          bottles: 255
+        },
+        {
+          country: "Australia",
+          litres: 139.9,
+          bottles: 452
+        },
+        {
+          country: "Austria",
+          litres: 128.3,
+          bottles: 332
+        },
+        {
+          country: "UK",
+          litres: 99,
+          bottles: 150
+        },
+        {
+          country: "Belgium",
+          litres: 60,
+          bottles: 178
+        },
+        {
+          country: "The Netherlands",
+          litres: 50,
+          bottles: 50
+        }
+      ];
+
+      // Set data
+      // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+      series0.data.setAll(data);
+      series1.data.setAll(data);
+
+    }); // end am5.ready()
+
+    am5.ready(function () {
+
+
+      // Create root element
+      // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+      var root = am5.Root.new("chartdiv1");
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = root.container.children.push(
+        am5xy.XYChart.new(root, {
+          focusable: true,
+          panX: true,
+          panY: true,
+          wheelX: "panX",
+          wheelY: "zoomX",
+          pinchZoomX: true
+        })
+      );
+
+      var easing = am5.ease.linear;
+      chart.get("colors").set("step", 3);
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var xAxis = chart.xAxes.push(
+        am5xy.DateAxis.new(root, {
+          maxDeviation: 0.1,
+          groupData: false,
+          baseInterval: {
+            timeUnit: "day",
+            count: 1
+          },
+          renderer: am5xy.AxisRendererX.new(root, {
+            minGridDistance: 80,
+            minorGridEnabled: true
+          }),
+          tooltip: am5.Tooltip.new(root, {})
+        })
+      );
+
+      function createAxisAndSeries(startValue, opposite) {
+        var yRenderer = am5xy.AxisRendererY.new(root, {
+          opposite: opposite
+        });
+        var yAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            maxDeviation: 1,
+            renderer: yRenderer
+          })
+        );
+
+        if (chart.yAxes.indexOf(yAxis) > 0) {
+          yAxis.set("syncWithAxis", chart.yAxes.getIndex(0));
+        }
+
+        // Add series
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+        var series = chart.series.push(
+          am5xy.LineSeries.new(root, {
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: "value",
+            valueXField: "date",
+            tooltip: am5.Tooltip.new(root, {
+              pointerOrientation: "horizontal",
+              labelText: "{valueY}"
+            })
+          })
+        );
+
+        //series.fills.template.setAll({ fillOpacity: 0.2, visible: true });
+        series.strokes.template.setAll({ strokeWidth: 1 });
+
+        yRenderer.grid.template.set("strokeOpacity", 0.05);
+        yRenderer.labels.template.set("fill", series.get("fill"));
+        yRenderer.setAll({
+          stroke: series.get("fill"),
+          strokeOpacity: 1,
+          opacity: 1
+        });
+
+        // Set up data processor to parse string dates
+        // https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data
+        series.data.processor = am5.DataProcessor.new(root, {
+          dateFormat: "yyyy-MM-dd",
+          dateFields: ["date"]
+        });
+
+        series.data.setAll(generateChartData(startValue));
+      }
+
+      // Add cursor
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+        xAxis: xAxis,
+        behavior: "none"
+      }));
+      cursor.lineY.set("visible", false);
+
+      // add scrollbar
+      chart.set("scrollbarX", am5.Scrollbar.new(root, {
+        orientation: "horizontal"
+      }));
+
+      createAxisAndSeries(100, false);
+      createAxisAndSeries(1000, true);
+      createAxisAndSeries(8000, true);
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+
+      // Generates random data, quite different range
+      function generateChartData(value) {
+        var data = [];
+        var firstDate = new Date();
+        firstDate.setDate(firstDate.getDate() - 100);
+        firstDate.setHours(0, 0, 0, 0);
+
+        for (var i = 0; i < 100; i++) {
+          var newDate = new Date(firstDate);
+          newDate.setDate(newDate.getDate() + i);
+
+          value += Math.round(
+            ((Math.random() < 0.5 ? 1 : -1) * Math.random() * value) / 20
+          );
+
+          data.push({
+            date: newDate,
+            value: value
+          });
+        }
+        return data;
+      }
+
+    });
+
+    am5.ready(function () {
+
+
+      // Create root element
+      // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+      var root = am5.Root.new("chartdiv4");
+
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: false,
+        panY: false,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        paddingLeft: 0,
+        layout: root.verticalLayout
+      }));
+
+      // Add scrollbar
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+      chart.set("scrollbarX", am5.Scrollbar.new(root, {
+        orientation: "horizontal"
+      }));
+
+      var data = [{
+        "year": "2021",
+        "europe": 2.5,
+        "namerica": 2.5,
+        "asia": 2.1,
+        "lamerica": 1,
+        "meast": 0.8,
+        "africa": 0.4
+      }, {
+        "year": "2022",
+        "europe": 2.6,
+        "namerica": 2.7,
+        "asia": 2.2,
+        "lamerica": 0.5,
+        "meast": 0.4,
+        "africa": 0.3
+      }, {
+        "year": "2023",
+        "europe": 2.8,
+        "namerica": 2.9,
+        "asia": 2.4,
+        "lamerica": 0.3,
+        "meast": 0.9,
+        "africa": 0.5
+      }]
+
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var xRenderer = am5xy.AxisRendererX.new(root, {
+        minorGridEnabled: true
+      });
+      var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: "year",
+        renderer: xRenderer,
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      xRenderer.grid.template.setAll({
+        location: 1
+      })
+
+      xAxis.data.setAll(data);
+
+      var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {
+          strokeOpacity: 0.1
+        })
+      }));
+
+
+      // // Add legend
+      // // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+      // var legend = chart.children.push(am5.Legend.new(root, {
+      //   centerX: am5.p50,
+      //   x: am5.p50
+      // }));
+
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function makeSeries(name, fieldName) {
+        var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+          name: name,
+          stacked: true,
+          xAxis: xAxis,
+          yAxis: yAxis,
+          valueYField: fieldName,
+          categoryXField: "year"
+        }));
+
+        series.columns.template.setAll({
+          tooltipText: "{name}, {categoryX}: {valueY}",
+          tooltipY: am5.percent(10)
+        });
+        series.data.setAll(data);
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        series.appear();
+
+        series.bullets.push(function () {
+          return am5.Bullet.new(root, {
+            sprite: am5.Label.new(root, {
+              text: "{valueY}",
+              fill: root.interfaceColors.get("alternativeText"),
+              centerY: am5.p50,
+              centerX: am5.p50,
+              populateText: true
+            })
+          });
+        });
+
+        legend.data.push(series);
+      }
+
+      makeSeries("Europe", "europe");
+      makeSeries("North America", "namerica");
+      makeSeries("Asia", "asia");
+      makeSeries("Latin America", "lamerica");
+      makeSeries("Middle East", "meast");
+      makeSeries("Africa", "africa");
+
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+
+    }); // end am5.ready()
+
+    am5.ready(function () {
+
+      // Create root element
+      // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+      var root = am5.Root.new("chartdiv3");
+
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+
+      // Create the map chart
+      // https://www.amcharts.com/docs/v5/charts/map-chart/
+      var chart = root.container.children.push(am5map.MapChart.new(root, {
+        panX: "translateX",
+        panY: "translateY",
+        projection: am5map.geoMercator()
+      }));
+
+
+      // Create main polygon series for countries
+      // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+      var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+        geoJSON: am5geodata_worldLow,
+        exclude: ["AQ"]
+      }));
+
+      polygonSeries.mapPolygons.template.setAll({
+        tooltipText: "{name}",
+        toggleKey: "active",
+        interactive: true
+      });
+
+      polygonSeries.mapPolygons.template.states.create("hover", {
+        fill: root.interfaceColors.get("primaryButtonHover")
+      });
+
+      polygonSeries.mapPolygons.template.states.create("active", {
+        fill: root.interfaceColors.get("primaryButtonHover")
+      });
+
+
+      // US Series
+      // Create main polygon series for countries
+      // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+      var polygonSeriesUS = chart.series.push(am5map.MapPolygonSeries.new(root, {
+        geoJSON: am5geodata_usaLow
+      }));
+
+      polygonSeriesUS.mapPolygons.template.setAll({
+        tooltipText: "{name}",
+        toggleKey: "active",
+        interactive: true
+      });
+
+      var colors = am5.ColorSet.new(root, {});
+
+      polygonSeriesUS.mapPolygons.template.set("fill", colors.getIndex(3));
+
+      polygonSeriesUS.mapPolygons.template.states.create("hover", {
+        fill: root.interfaceColors.get("primaryButtonHover")
+      });
+
+      polygonSeriesUS.mapPolygons.template.states.create("active", {
+        fill: root.interfaceColors.get("primaryButtonHover")
+      });
+
+
+
+      // Add zoom control
+      // https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
+      var zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+      zoomControl.homeButton.set("visible", true);
+
+      // Set clicking on "water" to zoom out
+      chart.chartContainer.get("background").events.on("click", function () {
+        chart.goHome();
+      })
+
+
+      // Make stuff animate on load
+      chart.appear(1000, 100);
+
+    }); // end am5.ready()
+  </script>
+
+</body>
+
+{% endblock %}
