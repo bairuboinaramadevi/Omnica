@@ -1,5 +1,5 @@
 # Omnica
-# My Awesome Python Web App (Flask & FastAPI)
+# Omnica Python Web App (Flask & FastAPI)
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/Flask-%E2%82%99.0+-green.svg)](https://flask.palletsprojects.com/)
@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Maintenance](https://img.shields.io/maintenance/yes/2025)
 
-This repository contains the source code for my awesome Python web application, which leverages both Flask and FastAPI frameworks.
+This repository contains the source code for Omnica Python web application, which leverages both Flask and FastAPI frameworks.
 
 ## Overview
 
@@ -22,7 +22,7 @@ This application demonstrates how to integrate and utilize both Flask and FastAP
 
 ## Project Structure
 ```
-my-awesome-app/
+Omnica/
 ├── app.py           # Main application entry point
 ├── requirements.txt # Project dependencies
 ├── flask_module/    # Flask-specific code
