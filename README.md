@@ -21,6 +21,7 @@ This application demonstrates how to integrate and utilize both Flask and FastAP
 * **Basic Examples:** Provides simple examples for both frameworks.
 
 ## Project Structure
+```
 my-awesome-app/
 ├── app.py           # Main application entry point
 ├── requirements.txt # Project dependencies
@@ -32,7 +33,7 @@ my-awesome-app/
 └── fastapi_module/  # FastAPI-specific code
 ├── init.py
 └── main.py
-
+```
 ## Getting Started
 
 Follow these steps to get the application running on your local machine.
